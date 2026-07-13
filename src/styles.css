@@ -1,0 +1,183 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-container: var(--primary-container);
+  --color-on-primary-container: var(--on-primary-container);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --font-display: "Space Grotesk", system-ui, -apple-system, sans-serif;
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+:root {
+  --radius: 1.25rem;
+  --background: oklch(0.98 0.01 300);
+  --foreground: oklch(0.15 0.02 285);
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.15 0.02 285);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0.02 285);
+
+  --primary: oklch(0.52 0.19 295);
+  --primary-foreground: oklch(0.99 0.005 300);
+  --primary-container: oklch(0.92 0.06 300);
+  --on-primary-container: oklch(0.22 0.12 295);
+
+  --secondary: oklch(0.93 0.03 300);
+  --secondary-foreground: oklch(0.22 0.05 295);
+
+  --muted: oklch(0.95 0.015 300);
+  --muted-foreground: oklch(0.48 0.03 290);
+
+  --accent: oklch(0.68 0.17 340);
+  --accent-foreground: oklch(0.99 0.005 300);
+
+  --destructive: oklch(0.6 0.22 27);
+  --destructive-foreground: oklch(0.99 0.005 300);
+
+  --border: oklch(0.9 0.015 295);
+  --input: oklch(0.94 0.015 295);
+  --ring: oklch(0.52 0.19 295);
+
+  --gradient-hero:
+    radial-gradient(
+      1200px 600px at 10% -10%,
+      color-mix(in oklab, var(--primary) 25%, transparent),
+      transparent 60%
+    ),
+    radial-gradient(
+      900px 500px at 110% 10%,
+      color-mix(in oklab, var(--accent) 22%, transparent),
+      transparent 60%
+    ),
+    linear-gradient(180deg, var(--background), var(--background));
+
+  --shadow-elevated:
+    0 30px 60px -20px color-mix(in oklab, var(--primary) 28%, transparent),
+    0 12px 24px -12px color-mix(in oklab, var(--primary) 20%, transparent);
+  --shadow-soft: 0 8px 24px -12px
+    color-mix(in oklab, var(--foreground) 18%, transparent);
+
+  --glass-bg: color-mix(in oklab, white 60%, transparent);
+  --glass-border: color-mix(in oklab, white 70%, transparent);
+}
+
+.dark {
+  --background: oklch(0.15 0.02 285);
+  --foreground: oklch(0.97 0.01 300);
+
+  --card: oklch(0.2 0.03 285);
+  --card-foreground: oklch(0.97 0.01 300);
+  --popover: oklch(0.2 0.03 285);
+  --popover-foreground: oklch(0.97 0.01 300);
+
+  --primary: oklch(0.78 0.15 295);
+  --primary-foreground: oklch(0.18 0.05 295);
+  --primary-container: oklch(0.32 0.12 295);
+  --on-primary-container: oklch(0.92 0.06 300);
+
+  --secondary: oklch(0.28 0.04 290);
+  --secondary-foreground: oklch(0.97 0.01 300);
+
+  --muted: oklch(0.24 0.03 285);
+  --muted-foreground: oklch(0.72 0.03 290);
+
+  --accent: oklch(0.75 0.15 340);
+  --accent-foreground: oklch(0.15 0.05 295);
+
+  --destructive: oklch(0.7 0.19 22);
+  --destructive-foreground: oklch(0.15 0.02 285);
+
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 12%);
+  --ring: oklch(0.78 0.15 295);
+
+  --gradient-hero:
+    radial-gradient(
+      1200px 600px at 10% -10%,
+      color-mix(in oklab, var(--primary) 35%, transparent),
+      transparent 60%
+    ),
+    radial-gradient(
+      900px 500px at 110% 10%,
+      color-mix(in oklab, var(--accent) 30%, transparent),
+      transparent 60%
+    ),
+    linear-gradient(180deg, var(--background), var(--background));
+
+  --shadow-elevated:
+    0 30px 60px -20px oklch(0 0 0 / 0.6), 0 12px 24px -12px oklch(0 0 0 / 0.5);
+  --shadow-soft: 0 8px 24px -12px oklch(0 0 0 / 0.4);
+
+  --glass-bg: color-mix(in oklab, white 8%, transparent);
+  --glass-border: color-mix(in oklab, white 14%, transparent);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html,
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+}
+
+@utility glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid var(--glass-border);
+}
+
+@utility hero-bg {
+  background: var(--gradient-hero);
+}
+
+@utility shadow-elevated {
+  box-shadow: var(--shadow-elevated);
+}
+
+@utility shadow-soft {
+  box-shadow: var(--shadow-soft);
+}

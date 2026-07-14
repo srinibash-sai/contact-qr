@@ -122,10 +122,11 @@ export function Onboarding({
           <div className="col-span-2">
             <Field label="Mobile" error={errors.mobile}>
               <Input
-                type="tel"
+                inputMode="tel"
                 value={mobile}
                 onChange={(e) => {
-                  setMobile(e.target.value);
+                  const value = e.target.value.replace(/[^\d+\s()-]/g, "");
+                  setMobile(value);
                   setErrors((prev) => ({ ...prev, mobile: undefined }));
                 }}
                 placeholder="+1 555 123 4567"

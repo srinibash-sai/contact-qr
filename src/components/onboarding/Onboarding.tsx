@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { QrCode as QrIcon, Smartphone, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 
 import type { Profile } from "@/lib/db";
 import { useInstallPrompt } from "@/lib/pwa";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field } from "@/components/shared/Field";
+import { validateOnboardingInput } from "@/lib/validation";
 import { InstallGuide } from "./InstallGuide";
 
 export function Onboarding({
@@ -18,6 +20,9 @@ export function Onboarding({
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");
   const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState<
+    Partial<Record<"firstName" | "lastName" | "email" | "mobile", string>>
+  >({});
   const { canPrompt, installed, promptInstall, platform } = useInstallPrompt();
   const [showInstallGuide, setShowInstallGuide] = useState(false);
 
@@ -81,36 +86,48 @@ export function Onboarding({
           </h2>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <Field label="First name">
+          <Field label="First name" error={errors.firstName}>
             <Input
               value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
+              onChange={(e) => {
+                setFirstName(e.target.value);
+                setErrors((prev) => ({ ...prev, firstName: undefined }));
+              }}
               placeholder="Jane"
             />
           </Field>
-          <Field label="Last name">
+          <Field label="Last name" error={errors.lastName}>
             <Input
               value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
+              onChange={(e) => {
+                setLastName(e.target.value);
+                setErrors((prev) => ({ ...prev, lastName: undefined }));
+              }}
               placeholder="Doe"
             />
           </Field>
           <div className="col-span-2">
-            <Field label="Email">
+            <Field label="Email" error={errors.email}>
               <Input
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setErrors((prev) => ({ ...prev, email: undefined }));
+                }}
                 placeholder="jane@example.com"
               />
             </Field>
           </div>
           <div className="col-span-2">
-            <Field label="Mobile">
+            <Field label="Mobile" error={errors.mobile}>
               <Input
                 type="tel"
                 value={mobile}
-                onChange={(e) => setMobile(e.target.value)}
+                onChange={(e) => {
+                  setMobile(e.target.value);
+                  setErrors((prev) => ({ ...prev, mobile: undefined }));
+                }}
                 placeholder="+1 555 123 4567"
               />
             </Field>
@@ -118,17 +135,31 @@ export function Onboarding({
         </div>
 
         <Button
-          className="mt-5 h-12 w-full rounded-2xl bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-elevated transition-all duration-200 hover:shadow-lg hover:brightness-110 active:scale-[0.98] disabled:opacity-60"
+          className="mt-5 h-12 w-full rounded-2xl bg-linear-to-r from-primary to-accent text-primary-foreground shadow-elevated transition-all duration-200 hover:shadow-lg hover:brightness-110 active:scale-[0.98] disabled:opacity-60"
           disabled={saving || empty}
           onClick={async () => {
-            setSaving(true);
-            await onCreate({
-              name: "Personal",
+            const result = validateOnboardingInput({
               firstName,
               lastName,
               email,
               mobile,
             });
+
+            if (!result.ok) {
+              setErrors(result.errors);
+              toast.error("Please fix the highlighted fields");
+              return;
+            }
+
+            setSaving(true);
+            try {
+              await onCreate({
+                name: "Personal",
+                ...result.data,
+              });
+            } finally {
+              setSaving(false);
+            }
           }}
         >
           {saving ? (

@@ -4,6 +4,8 @@ import { toast } from "sonner";
 
 import type { Profile } from "@/lib/db";
 import { buildVCard } from "@/lib/vcard";
+import { validateProfileInput } from "@/lib/validation";
+import { cn } from "@/lib/utils";
 import { QRCode } from "@/components/QRCode";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,18 +13,8 @@ import { Field, Section } from "@/components/shared/Field";
 
 const formatPhone = (v: string) => v.replace(/[^\d+\s()-]/g, "").slice(0, 24);
 
-const validateProfile = (p: Profile) => {
-  const e: Record<string, string> = {};
-  if (p.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(p.email))
-    e.email = "Invalid email";
-  if (
-    p.website &&
-    !/^https?:\/\/.+\..+/.test(p.website) &&
-    !/^[\w-]+(\.[\w-]+)+/.test(p.website)
-  )
-    e.website = "Invalid URL";
-  return e;
-};
+const inputErrorClass = (error?: string) =>
+  cn(error && "border-destructive focus-visible:ring-destructive");
 
 export function EditForm({
   initial,
@@ -70,8 +62,9 @@ export function EditForm({
 
       <div className="space-y-4 rounded-3xl bg-card p-5 shadow-soft">
         <Section title="Profile">
-          <Field label="Profile label">
+          <Field label="Profile label" error={errors.name}>
             <Input
+              className={inputErrorClass(errors.name)}
               value={p.name}
               onChange={(e) => set("name", e.target.value)}
             />
@@ -80,26 +73,30 @@ export function EditForm({
 
         <Section title="Identity">
           <div className="grid grid-cols-2 gap-3">
-            <Field label="First name">
+            <Field label="First name" error={errors.firstName}>
               <Input
+                className={inputErrorClass(errors.firstName)}
                 value={p.firstName}
                 onChange={(e) => set("firstName", e.target.value)}
               />
             </Field>
-            <Field label="Last name">
+            <Field label="Last name" error={errors.lastName}>
               <Input
+                className={inputErrorClass(errors.lastName)}
                 value={p.lastName}
                 onChange={(e) => set("lastName", e.target.value)}
               />
             </Field>
-            <Field label="Company">
+            <Field label="Company" error={errors.company}>
               <Input
+                className={inputErrorClass(errors.company)}
                 value={p.company}
                 onChange={(e) => set("company", e.target.value)}
               />
             </Field>
-            <Field label="Job title">
+            <Field label="Job title" error={errors.title}>
               <Input
+                className={inputErrorClass(errors.title)}
                 value={p.title}
                 onChange={(e) => set("title", e.target.value)}
               />
@@ -109,23 +106,26 @@ export function EditForm({
 
         <Section title="Contact">
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Mobile">
+            <Field label="Mobile" error={errors.mobile}>
               <Input
                 inputMode="tel"
+                className={inputErrorClass(errors.mobile)}
                 value={p.mobile}
                 onChange={(e) => set("mobile", formatPhone(e.target.value))}
               />
             </Field>
-            <Field label="Work phone">
+            <Field label="Work phone" error={errors.workPhone}>
               <Input
                 inputMode="tel"
+                className={inputErrorClass(errors.workPhone)}
                 value={p.workPhone}
                 onChange={(e) => set("workPhone", formatPhone(e.target.value))}
               />
             </Field>
-            <Field label="Fax">
+            <Field label="Fax" error={errors.fax}>
               <Input
                 inputMode="tel"
+                className={inputErrorClass(errors.fax)}
                 value={p.fax}
                 onChange={(e) => set("fax", formatPhone(e.target.value))}
               />
@@ -133,6 +133,7 @@ export function EditForm({
             <Field label="Email" error={errors.email}>
               <Input
                 type="email"
+                className={inputErrorClass(errors.email)}
                 value={p.email}
                 onChange={(e) => set("email", e.target.value.trim())}
               />
@@ -141,6 +142,7 @@ export function EditForm({
               <Field label="Website" error={errors.website}>
                 <Input
                   type="url"
+                  className={inputErrorClass(errors.website)}
                   value={p.website}
                   onChange={(e) => set("website", e.target.value.trim())}
                   placeholder="https://"
@@ -153,33 +155,38 @@ export function EditForm({
         <Section title="Address">
           <div className="grid grid-cols-2 gap-3">
             <div className="col-span-2">
-              <Field label="Street">
+              <Field label="Street" error={errors.street}>
                 <Input
+                  className={inputErrorClass(errors.street)}
                   value={p.street}
                   onChange={(e) => set("street", e.target.value)}
                 />
               </Field>
             </div>
-            <Field label="City">
+            <Field label="City" error={errors.city}>
               <Input
+                className={inputErrorClass(errors.city)}
                 value={p.city}
                 onChange={(e) => set("city", e.target.value)}
               />
             </Field>
-            <Field label="State">
+            <Field label="State" error={errors.state}>
               <Input
+                className={inputErrorClass(errors.state)}
                 value={p.state}
                 onChange={(e) => set("state", e.target.value)}
               />
             </Field>
-            <Field label="ZIP">
+            <Field label="ZIP" error={errors.zip}>
               <Input
+                className={inputErrorClass(errors.zip)}
                 value={p.zip}
                 onChange={(e) => set("zip", e.target.value)}
               />
             </Field>
-            <Field label="Country">
+            <Field label="Country" error={errors.country}>
               <Input
+                className={inputErrorClass(errors.country)}
                 value={p.country}
                 onChange={(e) => set("country", e.target.value)}
               />
@@ -197,15 +204,18 @@ export function EditForm({
           Cancel
         </Button>
         <Button
-          className="h-12 rounded-2xl bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-elevated transition-all duration-200 hover:brightness-110 hover:shadow-lg active:scale-[0.98]"
-          onClick={() => {
-            const e = validateProfile(p);
-            setErrors(e);
-            if (Object.keys(e).length) {
+          className="h-12 rounded-2xl bg-linear-to-r from-primary to-accent text-primary-foreground shadow-elevated transition-all duration-200 hover:brightness-110 hover:shadow-lg active:scale-[0.98]"
+          onClick={async () => {
+            const result = validateProfileInput(p);
+
+            if (!result.ok) {
+              setErrors(result.errors);
               toast.error("Please fix the highlighted fields");
               return;
             }
-            onSave(p);
+
+            setErrors({});
+            await onSave(result.data);
           }}
         >
           Save
